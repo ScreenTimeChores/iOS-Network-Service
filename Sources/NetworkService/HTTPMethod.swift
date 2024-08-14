@@ -9,4 +9,7 @@ public enum HTTPMethod: String, CaseIterable {
 
     /// The `PUT` method according to the [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.4).
     case put = "PUT"
+
+    /// The `DELETE` method according to the [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.4).
+    case delete = "DELETE"
 }

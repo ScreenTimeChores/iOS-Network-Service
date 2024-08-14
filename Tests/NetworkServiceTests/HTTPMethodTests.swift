@@ -9,6 +9,7 @@ final class HTTPMethodTests: XCTestCase {
             .get,
             .post,
             .put,
+            .delete
         ]
 
         // When // Then
@@ -19,5 +20,6 @@ final class HTTPMethodTests: XCTestCase {
         XCTAssertEqual(HTTPMethod.get.rawValue, "GET")
         XCTAssertEqual(HTTPMethod.post.rawValue, "POST")
         XCTAssertEqual(HTTPMethod.put.rawValue, "PUT")
+        XCTAssertEqual(HTTPMethod.delete.rawValue, "DELETE")
     }
 }
