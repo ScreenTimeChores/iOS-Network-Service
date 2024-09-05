@@ -49,8 +49,8 @@ public final class NetworkService<Endpoint: HTTPAPIEndpoint>: NetworkRouter {
 
     private func send(_ request: URLRequest) async throws -> Data {
         let (rawData, response) = try await URLSession.shared.data(for: request)
-        switch handle(response) {
-        // swiftlint:disable:next empty_enum_arguments
+
+        switch handle(response, data: rawData) {
         case .success(_):
             return rawData
         case let .failure(error):
@@ -58,24 +58,45 @@ public final class NetworkService<Endpoint: HTTPAPIEndpoint>: NetworkRouter {
         }
     }
 
-    private func handle(_ response: URLResponse) -> Result<Void, Error> {
+    private func handle(_ response: URLResponse, data: Data) -> Result<Void, Error> {
         guard let httpResponse = response as? HTTPURLResponse else {
             return .failure(NetworkError.badResponse)
         }
+        let decoder = JSONDecoder()
 
         switch httpResponse.statusCode {
         case 200...299:
             return .success(())
         case 400:
-            return .failure(NetworkError.badRequest)
+            if let serverError = try? decoder.decode(ServerErrorResponse.self, from: data) {
+                return .failure(NetworkError.custom(serverError.error))
+            } else {
+                return .failure(NetworkError.badRequest)
+            }
         case 401:
-            return .failure(NetworkError.authenticationError)
+            if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
+                return .failure(NetworkError.custom(serverError.error))
+            } else {
+                return .failure(NetworkError.authenticationError)
+            }
         case 402...499:
-            return .failure(NetworkError.clientError)
+            if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
+                return .failure(NetworkError.custom(serverError.error))
+            } else {
+                return .failure(NetworkError.clientError)
+            }
         case 500...599:
-            return .failure(NetworkError.serverError)
+            if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
+                return .failure(NetworkError.custom(serverError.error))
+            } else {
+                return .failure(NetworkError.serverError)
+            }
         default:
-            return .failure(NetworkError.unknownError)
+            if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
+                return .failure(NetworkError.custom(serverError.error))
+            } else {
+                return .failure(NetworkError.unknownError)
+            }
         }
     }
 }

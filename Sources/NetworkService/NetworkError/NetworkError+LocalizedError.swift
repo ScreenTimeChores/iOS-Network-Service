@@ -20,6 +20,8 @@ extension NetworkError: LocalizedError {
             return "The client timed out waiting for the resource."
         case .unknownError:
             return "Unknown error."
+        case let .custom(message):
+            return message
         }
     }
 }
