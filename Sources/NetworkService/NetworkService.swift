@@ -69,31 +69,31 @@ public final class NetworkService<Endpoint: HTTPAPIEndpoint>: NetworkRouter {
             return .success(())
         case 400:
             if let serverError = try? decoder.decode(ServerErrorResponse.self, from: data) {
-                return .failure(NetworkError.custom(serverError.error))
+                return .failure(NetworkError.custom(serverError.message))
             } else {
                 return .failure(NetworkError.badRequest)
             }
         case 401:
             if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
-                return .failure(NetworkError.custom(serverError.error))
+                return .failure(NetworkError.custom(serverError.message))
             } else {
                 return .failure(NetworkError.authenticationError)
             }
         case 402...499:
             if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
-                return .failure(NetworkError.custom(serverError.error))
+                return .failure(NetworkError.custom(serverError.message))
             } else {
                 return .failure(NetworkError.clientError)
             }
         case 500...599:
             if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
-                return .failure(NetworkError.custom(serverError.error))
+                return .failure(NetworkError.custom(serverError.message))
             } else {
                 return .failure(NetworkError.serverError)
             }
         default:
             if let serverError = try? JSONDecoder().decode(ServerErrorResponse.self, from: data) {
-                return .failure(NetworkError.custom(serverError.error))
+                return .failure(NetworkError.custom(serverError.message))
             } else {
                 return .failure(NetworkError.unknownError)
             }
